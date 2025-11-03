@@ -1,0 +1,37 @@
+[project]
+name = "public-dots"
+version = "0.1.0"
+description = "Dotfiles and environment setup"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+
+[tool.pytest.ini_options]
+pythonpath = [
+    "."
+]
+testpaths = [
+    "tests"
+]
+
+markers = [
+    "smoke: quick sanity tests to verify environment setup",
+    "integration: slower tests that check multi-module behavior",
+    "unit: fine-grained functional tests"
+]
+
+addopts = "-v"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+]
+
+lint = [
+    "black>=25.9.0",
+    "mypy>=1.18.2",
+    "ruff>=0.14.3",
+]
+
