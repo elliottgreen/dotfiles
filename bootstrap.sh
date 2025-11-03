@@ -98,15 +98,27 @@ echo "[+] Hardening sudo configuration..."
 sed -i '/NOPASSWD/d' /etc/sudoers
 echo "%wheel ALL=(ALL:ALL) ALL" >>/etc/sudoers
 
-# ---- 9. Enable SSH-agent-based sudo ----
-echo "[+] Configuring pam_ssh_agent_auth..."
-mkdir -p /etc/security/authorized_keys
-cp /home/$USER/.ssh/authorized_keys /etc/security/authorized_keys/$USER
-chown root:root /etc/security/authorized_keys/$USER
-chmod 644 /etc/security/authorized_keys/$USER
+# ---- 9. Configure YubiKey U2F-based sudo authentication ----
+echo "[+] Configuring pam_u2f for YubiKey-based sudo..."
 
-if ! grep -q pam_ssh_agent_auth /etc/pam.d/sudo; then
-  sed -i '1iauth sufficient pam_ssh_agent_auth.so file=/etc/security/authorized_keys/%u' /etc/pam.d/sudo
+# Ensure Yubico configuration directory
+sudo -u "$USER" bash <<'EOF'
+mkdir -p ~/.config/Yubico
+if ! [ -f ~/.config/Yubico/u2f_keys ]; then
+    echo "[*] Please insert your YubiKey and touch it when prompted..."
+    pamu2fcfg > ~/.config/Yubico/u2f_keys
+fi
+EOF
+
+# Copy mapping file system-wide
+mkdir -p /etc/Yubico
+cp /home/$USER/.config/Yubico/u2f_keys /etc/Yubico/
+chown root:root /etc/Yubico/u2f_keys
+chmod 600 /etc/Yubico/u2f_keys
+
+# Enable pam_u2f in sudo PAM configuration
+if ! grep -q pam_u2f /etc/pam.d/sudo; then
+  sed -i '1iauth required pam_u2f.so cue' /etc/pam.d/sudo
 fi
 
 echo "[✓] Bootstrap complete for environment: ${ENV_TYPE}"
