@@ -11,8 +11,8 @@ set -euo pipefail
 # ---- User settings ----
 USER="drone"
 GITHUB_USER="elliottgreen"
-REPO_URL="https://github.com/${GITHUB_USER}/arch-setup.git"
-REPO_DIR="/home/${USER}/arch-setup"
+REPO_URL="https://github.com/${GITHUB_USER}/dotfiles.git"
+REPO_DIR="/home/${USER}/dotfiles"
 
 # ---- 0. Detect environment ----
 detect_env() {

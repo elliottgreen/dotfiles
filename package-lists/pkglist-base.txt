@@ -3,3 +3,4 @@ nushell
 neovim
 glow
 ghostty
+gitleaks
