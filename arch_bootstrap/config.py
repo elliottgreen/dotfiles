@@ -24,6 +24,9 @@ def get_home_dir() -> Path:
 def get_repo_dir() -> Path:
     return get_home_dir() / "public-dots"
 
+def get_repo_url() -> str:
+    return os.getenv("BOOTSTRAP_REPO_URL", "https://github.com/<youruser>/public-dots.git")
+
 # ---------- PATHS ----------
 def get_pkgdir() -> Path:
     return get_repo_dir() / "package-lists"
