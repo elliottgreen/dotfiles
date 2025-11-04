@@ -1,110 +1,79 @@
-	# ============================================
-# Arch Bootstrap Project - Makefile
-# ============================================
-# Usage:
-#   make <target>
-# --------------------------------------------
-# --- Auto-load environment from .env if present ---
--include .env
-export $(shell sed 's/=.*//' .env 2>/dev/null)
+# =============================================
+# Arch Bootstrap Makefile
+# =============================================
 
-# Default environment variables (override in your shell or .env)
-BOOTSTRAP_USER ?= youruser
-BOOTSTRAP_GITHUB_USER ?= yourgithubusername
+PYTHON ?= python3
+MODULE := arch_bootstrap
+MAIN := $(MODULE)/main.py
 
-# Default Python runner (uses uv if available)
-PYTHON_RUN := uv run python
+# Environment variables (can be overridden)
+BOOTSTRAP_USER ?= $(shell whoami)
+BOOTSTRAP_GITHUB_USER ?= $(BOOTSTRAP_USER)
+BOOTSTRAP_REPO_URL ?= https://github.com/$(BOOTSTRAP_USER)/public-dots.git
 
-# --------------------------------------------
-# Help Section
-# --------------------------------------------
-.PHONY: help
-help:
-	@echo ""
-	@echo "Arch Bootstrap Makefile"
-	@echo "========================"
-	@echo ""
-	@echo "Available targets:"
-	@grep -E '^[a-zA-Z_-]+:.*?##' Makefile | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
-	@echo ""
-	@echo "Environment:"
-	@echo "  BOOTSTRAP_USER=$(BOOTSTRAP_USER)"
-	@echo "  BOOTSTRAP_GITHUB_USER=$(BOOTSTRAP_GITHUB_USER)"
-	@echo ""
+# =============================================
+# Default target
+# =============================================
 
-# --------------------------------------------
-# Targets
-# --------------------------------------------
-.PHONY: show-config
-show-config: ## Print resolved configuration variables
-	@echo "Running config summary with:"
-	@echo "  BOOTSTRAP_USER=$(BOOTSTRAP_USER)"
-	@echo "  BOOTSTRAP_GITHUB_USER=$(BOOTSTRAP_GITHUB_USER)"
-	@$(PYTHON_RUN) -c "from arch_bootstrap import config; print(config.debug_summary())"
+.DEFAULT_GOAL := help
 
-.PHONY: setup-env
-setup-env: ## Run interactive environment setup script
-	@uv run python tools/env_setup.py
-
-.PHONY: test-make
-test-make: ## make test-make  → Run tests that validate Makefile targets and mocks
-	@echo "🧪 Running Makefile target tests..."
-	@if [ -d .venv ]; then \
-		. .venv/bin/activate; \
-	else \
-		echo "⚙️  Creating virtual environment with uv"; \
-		uv sync --all-groups; \
-		. .venv/bin/activate; \
-	fi; \
-	uv run pytest -v tests/test_make_targets.py
-
-.PHONY: test
-test: ## Run the pytest suite
-	@echo "Running test suite..."
-	@uv run pytest -v
-
-.PHONY: smoke
-smoke: ## Run only smoke tests
-	@echo "Running smoke tests..."
-	@uv run pytest -v -m smoke
-
-.PHONY: lint
-lint: ## Run formatters and static analysis
-	@echo "Running Ruff, Black, and Mypy..."
-	@uv run ruff check .
-	@uv run black --check .
-	@uv run mypy arch_bootstrap/
-
-.PHONY: incus-run
-incus-run: ## Execute the bootstrap script inside the Incus test container
-	@echo "🧱 Running inside Incus container 'public-dots-test'..."
-	incus exec public-dots-test -- bash -lc "cd /root/public-dots && make run"
+# =============================================
+# Main Targets
+# =============================================
 
 .PHONY: run
-run: ## Run the main bootstrap script (loads .env and uses .venv)
-	@echo "🚀 Running main bootstrap script..."
-	@if [ -f .env ]; then \
-		echo "🔧 Loading environment from .env"; \
-		set -a; source .env; set +a; \
-	fi; \
-	if [ -d .venv ]; then \
-		echo "🐍 Using existing virtual environment"; \
-		. .venv/bin/activate; \
-	else \
-		echo "⚙️  Creating virtual environment with uv"; \
-		uv sync --all-groups; \
-		. .venv/bin/activate; \
-	fi; \
-	python arch_bootstrap/main.py
+run: ## Run full Arch bootstrap process (user, packages, repo, dotfiles)
+	@echo "==> Running Arch Bootstrap as $(BOOTSTRAP_USER)"
+	sudo BOOTSTRAP_USER=$(BOOTSTRAP_USER) \
+	     BOOTSTRAP_GITHUB_USER=$(BOOTSTRAP_GITHUB_USER) \
+	     BOOTSTRAP_REPO_URL=$(BOOTSTRAP_REPO_URL) \
+	     $(PYTHON) -m $(MODULE).main
+
+.PHONY: test
+test: ## Run full test suite
+	@echo "==> Running all tests..."
+	pytest -v tests
+
+.PHONY: smoke
+smoke: ## Run smoke tests only
+	@echo "==> Running smoke tests..."
+	pytest -m smoke -v
+
+.PHONY: lint
+lint: ## Run lint checks using ruff
+	@echo "==> Running linter..."
+	ruff check $(MODULE) tests
 
 .PHONY: clean
-clean: ## Remove cache and temporary files
-	@echo "Cleaning up temp files..."
-	@find . -type d -name "__pycache__" -exec rm -rf {} +
-	@rm -rf .pytest_cache .coverage
+clean: ## Remove build and cache artifacts
+	@echo "==> Cleaning up..."
+	rm -rf __pycache__ */__pycache__ .pytest_cache .ruff_cache *.egg-info build dist
 
-# --------------------------------------------
-# Default target (runs help)
-# --------------------------------------------
-.DEFAULT_GOAL := help
+.PHONY: env
+env: ## Print current environment variable values
+	@echo "BOOTSTRAP_USER        = $(BOOTSTRAP_USER)"
+	@echo "BOOTSTRAP_GITHUB_USER = $(BOOTSTRAP_GITHUB_USER)"
+	@echo "BOOTSTRAP_REPO_URL    = $(BOOTSTRAP_REPO_URL)"
+
+.PHONY: setup-env
+setup-env: ## Show example export commands
+	@echo "export BOOTSTRAP_USER=$(BOOTSTRAP_USER)"
+	@echo "export BOOTSTRAP_GITHUB_USER=$(BOOTSTRAP_GITHUB_USER)"
+	@echo "export BOOTSTRAP_REPO_URL=$(BOOTSTRAP_REPO_URL)"
+
+.PHONY: incus-run
+incus-run: ## Run bootstrap inside an Incus container
+	@echo "==> Running inside Incus container..."
+	incus exec mycontainer -- $(PYTHON) -m $(MODULE).main
+
+# =============================================
+# Dynamic help (extracts ## comments)
+# =============================================
+
+.PHONY: help
+help: ## Show this help message
+	@echo ""
+	@echo "Available targets:"
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9\._-]+:.*?## / {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo ""
 
