@@ -1,0 +1,69 @@
+
+#### 'Go' codes ;-) 
+alias goram='sudo mount -t ramfs -o size=512m ramfs $HOME/working/ramdisk && sudo chown -R `whoami`:`whoami` $HOME/working/ramdisk'
+
+#### 'No' codes :-(
+alias nopram='sudo umount `pwd`/ramdisk'
+
+#### 'set' commands
+alias set-gpg-agent='export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket) && echo "Using GPG SSH agent"'
+alias set-ansible-agent='start_ansible_agent && export SSH_AUTH_SOCK=$ANSIBLE_SSH_AUTH_SOCK && echo "Using Ansible SSH agent"'
+
+### 'get' commands
+alias get-agent-stat='echo "Active SSH agent: $SSH_AUTH_SOCK"; ssh-add -l'
+
+#### 'sho' codes
+alias shoisi='sudo tgtadm --lld iscsi --mode target --op show'
+
+### 'Check' thinks from 'Go' block 
+alias chkram='findmnt -D --all -t ramfs'
+
+### 'Q' codes
+alias qpy='podman run -it --rm --name my-running-script -v "$PWD":/usr/src/myapp -w /usr/src/myapp python:alpine python'
+
+#### Podman commands
+alias pc='podman-compose'
+alias pcd='podman-compose down'
+alias pcu='podman-compose up'
+alias pcr='podman-compose run'
+alias pmp='pm image prune'
+alias pms='pm secret ls | sort -k2,2'
+alias pmup="podman images | grep -v REPOSITORY| awk '{print $1}'| xargs -L1 podman pull"
+alias pmclean='podman system prune --all --volumes --force'
+alias pm='podman'
+alias podman='podman --cgroup-manager cgroupfs --events-backend file'
+alias podsock='sudo systemctl start podman.socket'
+
+#### Misc. aliases
+alias 411='sha256sum'
+alias cat='bat'
+alias cl='clear'
+alias down='poweroff'
+alias glw='glow'
+alias lg='lazygit'
+alias ls='eza'
+alias lsd='eza -d */'
+alias lt='eza --tree -git l'
+alias ll='eza -al'
+alias mnt='mount'
+alias nf='neofetch'
+alias pact='source .venv/bin/activate'
+alias pomo='termdown -t Pomodoro -v en-gb -s 24m'
+alias pomopause='termdown -t Pomodoro -v en-gb -s 5m'
+alias power='upower -i /org/freedesktop/UPower/devices/battery_BAT1'
+alias pt='pytest -v'
+alias po='popd'
+alias pu='pushd'
+alias see='cmatrix'
+alias um='umount'
+alias update='sudo pacman -Syu'
+alias vim='nvim'
+alias v='nvim'
+alias vt='v --cmd "set rtp+=./"'
+alias vv='vim $HOME/.config/nvim/init.lua'
+alias work='fc -p'
+alias wtf='btop'
+alias za='zellij attach'
+alias zl='zellij'
+alias zll='zellij ls'
+

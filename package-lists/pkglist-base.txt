@@ -3,4 +3,9 @@ nushell
 neovim
 glow
 ghostty
+git
 gitleaks
+stow
+bat
+eza
+neofetch

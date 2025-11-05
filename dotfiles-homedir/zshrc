@@ -1,0 +1,71 @@
+# Setting up Zinit directory
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+
+# Download Zinit, if it's not already here. --> Portability
+if [ ! -d "$ZINIT_HOME" ]; then
+  mkdir -p "$(dirname $ZINIT_HOME)"
+  git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+fi
+
+# Source the zinit file
+source "$ZINIT_HOME/zinit.zsh"
+
+# Include alias file
+[[ -f ~/.aliases ]] && source ~/.aliases
+
+# Zsh plugins
+zinit light zsh-users/zsh-syntax-highlighting
+zinit light zsh-users/zsh-completions
+zinit light zsh-users/zsh-autosuggestions
+zinit light Aloxaf/fzf-tab
+
+# Try vim keybindings
+bindkey -v
+
+# Add keybindings to search through hist file
+# j for next k for last
+bindkey '^k' history-search-backward
+bindkey '^j' history-search-forward
+
+# Add keybinding to accept the suggested complketion 
+# WITHOUT having to reach or the arrow keys. 
+bindkey '^ ' autosuggest-accept
+
+# Load the completions ('zsh-completions' plugin)
+autoload -U compinit && compinit
+
+# Keep history of commands 
+HISTSIZE=5000
+HISTFILE=~/.zsh_history
+SAVEHIST=$HISTSIZE
+HISTDUP=erase
+setopt appendhistory
+setopt sharehistory
+setopt hist_ignore_space
+setopt hist_ignore_all_dups
+setopt hist_save_no_dups
+setopt hist_ignore_dups
+setopt hist_find_no_dups
+
+# Completion Styling
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' list-colors "${(s.:.)EZA_COLORS}"
+zstyle ':completion:*' menu no
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --color $realpath'
+
+# internal Alias for autocomplete colors
+alias ls='eza'
+
+# Shell Integrations
+eval "$(fzf --zsh)"
+eval "$(zoxide init --cmd cd zsh)"
+
+# activate Oh-My-Posh
+eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/zen2.yaml)"
+
+# add agent forwarding
+eval "$(ssh-agent -s)"
+
+# ENV Variables
+export EDITOR='nvim'
+
