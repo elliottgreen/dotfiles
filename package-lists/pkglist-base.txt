@@ -1,3 +1,5 @@
+base-devel
+openssh
 zellij
 nushell
 neovim

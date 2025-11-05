@@ -53,10 +53,28 @@ echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers
 > ✅ FIX THIS AFTER SETUP!!!!!!!!
 ---
 
-### **3. Clone your dotfiles repo and apply with GNU Stow**
+### **3. Install Paru (AUR helper)**
+
+Paru makes it easy to install both official and AUR packages.
+
+sudo pacman -S --needed git base-devel
+git clone https://aur.archlinux.org/paru.git
+cd paru
+makepkg -si
+
+
+After installation, you can optionally set up a configuration file:
+
+mkdir -p ~/.config/paru
+wget https://raw.githubusercontent.com/katsuki-yuri/dots/master/.config/paru/paru.conf
+
+
+Paru works like pacman but adds AUR support and lets you review PKGBUILDs before installation.
+
+### **4. Clone your dotfiles repo and apply with GNU Stow**
 
 Run as the new user (or use `sudo -u <username>`):
-> Note: This pulls just one directory (*maybe two...*)
+> Note: This pulls just one directory (*or multiple*)
 
 1. Initialize a new Git repository in your desired directory: (we'll say 'dots')
    ```bash
@@ -73,12 +91,12 @@ Run as the new user (or use `sudo -u <username>`):
    git config core.sparseCheckout true
    ```
 
-4. Specify the directory you want to pull by adding its path to the sparse-checkout file:
+4. Specify the directory(s) you want to pull by adding its path to the sparse-checkout file:
    ```bash
    echo "path/to/your/directory/" >> .git/info/sparse-checkout
    ```
 
-5. Fetch and pull the specified directory:
+5. Fetch and pull the specified directory(s):
    ```bash
    git fetch origin
    git pull origin master

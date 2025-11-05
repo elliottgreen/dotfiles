@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json
+
+console_title_template: "{{ .Env.USERNAME}}@{{ .HostName}}"
+blocks:
+- type: prompt
+  alignment: left
+  newline: true
+  segments:
+      - type: 'path'
+        # https://ohmyposh.dev/docs/segments/system/path
+        style: 'plain'
+        background: 'transparent'
+        foreground: 'blue'
+        template: '{{ .Path }}'
+- type: prompt
+  alignment: left
+  segments:
+      - type: 'git'
+        sytle: 'plain'
+        foreground: '#6c6c6c'
+        background: 'transparent'
+        template: ' {{ .HEAD }}{{   if or (.Working.Changed) (.Staging.Changed)}}*{{ end }}
+          <cyan>{{ if gt .Behind 0}}🡓 {{ end }}{{ if gt .Ahead 0}} 🡑 {{ end }}</>'
+        properties:
+          branch_icon: ''
+          commit_icon: '@'
+          fetch_status: true
+
+- type: prompt
+  alignment: left
+  newline: true
+  segments:
+      - type: status
+        # https://ohmyposh.dev/docs/segments/system/text
+        style: 'plain'
+        # foreground: 'blue'
+        foreground_templates: 
+          - '{{if gt .Code 0}}red{{end}}'
+          - '{{if eq .Code 0}}blue{{end}}'
+        template: 'λ '
+        properties:
+          always_enabled: true
+transient_prompt:
+  background: transparent
+  foreground_templates: 
+    - '{{if gt .Code 0}}red{{end}}'
+    - '{{if eq .Code 0}}blue{{end}}'
+  template: 'λ '
+
+version: 3
