@@ -55,10 +55,6 @@ setup-env: ## Run interactive environment setup script
 	@echo "==> Launching environment setup..."
 	@uv run python tools/env_setup.py
 
-.PHONY: setup-env
-setup-env: ## Run interactive environment setup script
-	@uv run python tools/env_setup.py
-
 .PHONY: incus-run
 incus-run: ## Run bootstrap inside an Incus container
 	@echo "==> Running inside Incus container..."
