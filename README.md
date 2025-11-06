@@ -121,6 +121,6 @@ stow -t ~/.config dotfiles
 Then steps 4 $ 5 again for dots that have to be in the home folder:
 ```bash
 cd dots-home
-stow -t ~ dotfiles-homedir
+stow -t ~ --dotfiles dotfiles-homedir
 ```
 
