@@ -1,0 +1,4 @@
+# check full AUR names first, or it'll bork``
+oh-my-posh
+opencode-bin
+neofetch
